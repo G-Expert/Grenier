@@ -1,20 +1,15 @@
-  <!-- Page Content -->
 <?php
-// $off = offre(22);
-// dd($off);
-// $ville = ReadVille(2);
-// dd($ville);
-  // $res = delOffre(5);
-  // dd($res);
+  #Liste des offres
   $offre = offre($_SESSION['id_user']);
-  // // @foreach ($offre as $key => $value)
-  // //   {{ReadVille($value->id)}}
-  // // @endforeach
-  // foreach ($offre as $key => $value) {
-  //   ReadVille($value->arrive);
-  // }
-
-
+  #Reservation en cours
+  $res_new = reserv($_SESSION['id_user'],0);
+  //dd($res_new);
+  #Reservation livrée
+  $res_liv = reserv(21,0);
+  //dd($res_liv);
+  #transporteur
+  //$transp = transp(6);
+  //dd($transp);
 ?>
   <div class="pt-5">
     <div class="container">

@@ -86,3 +86,40 @@ function ReadUnites($id)
    $idtransp = $transp->id;
    return $idtransp;
  }
+
+# Gestion des réservations
+function reserv($user,$statut)
+{
+  $offres = DB::table('offre_has_client')
+            ->join('users', 'offre_has_client.user_id','=','users.id')
+            ->join('offres', 'offre_has_client.offre_id','=','offres.id')
+            ->select('offre_has_client.*','offres.*','offres.id as Usid')
+            ->where('offre_has_client.user_id', '=', $user)
+            ->where('offre_has_client.statut', '=', $statut)
+            ->get();
+  return $offres;
+}
+
+#Gestion des transporteurs
+// function transp($id)
+// {
+//   $transp = DB::table('transporteurs')
+//             ->join('users', 'transporteurs.user_id','=','users.id')
+//             ->select('transporteurs.*','users.*','users.id as Usid','transporteurs.id as Tpsid')
+//             ->where('transporteurs.id', '=', $id)
+//             ->get();
+//   return $transp;
+// }
+
+#Gestion des livraison
+function livr($transp,$statut)
+{
+  $offres = DB::table('offre_has_client')
+            ->join('users', 'offre_has_client.user_id','=','users.id')
+            ->join('offres', 'offre_has_client.offre_id','=','offres.id')
+            ->select('offre_has_client.*','offres.*','offres.id as Usid')
+            ->where('offre_has_client.offre_transporteur_id', '=', $transp)
+            ->where('offre_has_client.livraison', '=', $statut)
+            ->get();
+  return $offres;
+}
