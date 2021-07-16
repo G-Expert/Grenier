@@ -93,7 +93,7 @@ function reserv($user,$statut)
   $offres = DB::table('offre_has_client')
             ->join('users', 'offre_has_client.user_id','=','users.id')
             ->join('offres', 'offre_has_client.offre_id','=','offres.id')
-            ->select('offre_has_client.*','offres.*','offres.id as Usid')
+            ->select('offre_has_client.*','offres.*','offres.id as Usid','offre_has_client.updated_at as livdate')
             ->where('offre_has_client.user_id', '=', $user)
             ->where('offre_has_client.statut', '=', $statut)
             ->get();
@@ -101,15 +101,48 @@ function reserv($user,$statut)
 }
 
 #Gestion des transporteurs
-// function transp($id)
-// {
-//   $transp = DB::table('transporteurs')
-//             ->join('users', 'transporteurs.user_id','=','users.id')
-//             ->select('transporteurs.*','users.*','users.id as Usid','transporteurs.id as Tpsid')
-//             ->where('transporteurs.id', '=', $id)
-//             ->get();
-//   return $transp;
-// }
+function transp($id)
+{
+  $transp = DB::table('transporteurs')
+            ->join('users', 'transporteurs.user_id','=','users.id')
+            ->select('transporteurs.*','users.*','users.id as Usid','transporteurs.id as Tpsid')
+            ->where('transporteurs.id', '=', $id)
+            ->get();
+  return $transp;
+}
+
+function transpTel($id)
+{
+  $transp = DB::table('transporteurs')
+            ->join('users', 'transporteurs.user_id','=','users.id')
+            ->select('transporteurs.*','users.*','users.id as Usid','transporteurs.id as Tpsid')
+            ->where('transporteurs.id', '=', $id)
+            ->first();
+  return $transp->tel;
+}
+
+function transpNom($id)
+{
+  $transp = DB::table('transporteurs')
+            ->join('users', 'transporteurs.user_id','=','users.id')
+            ->select('transporteurs.*','users.*','users.id as Usid','transporteurs.id as Tpsid')
+            ->where('transporteurs.id', '=', $id)
+            ->first();
+  $nomT = $transp->nom.' '.$transp->prenom;
+  return $nomT;
+}
+
+function transpProf($id)
+{
+  $transp = DB::table('transporteurs')
+            ->join('users', 'transporteurs.user_id','=','users.id')
+            ->select('transporteurs.*','users.*','users.id as Usid','transporteurs.id as Tpsid')
+            ->where('transporteurs.id', '=', $id)
+            ->first();
+  return $transp->profile;
+}
+
+
 
 #Gestion des livraison
 function livr($transp,$statut)

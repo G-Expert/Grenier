@@ -3,13 +3,14 @@
   $offre = offre($_SESSION['id_user']);
   #Reservation en cours
   $res_new = reserv($_SESSION['id_user'],0);
-  //dd($res_new);
+  $resNew = count($res_new);
   #Reservation livrée
-  $res_liv = reserv(21,0);
-  //dd($res_liv);
+  $res_liv = reserv($_SESSION['id_user'],1);
+  $resLiv = count($res_liv);
+  // dd($res_liv);
   #transporteur
-  //$transp = transp(6);
-  //dd($transp);
+  // $transp = transpProf(6);
+  // dd($transp);
 ?>
   <div class="pt-5">
     <div class="container">
@@ -35,6 +36,10 @@
 
             <div>
               <a href="/" class="btn btn-warning btn-sm d-none d-md-block">Commencer ici</a>
+            </div>
+
+            <div>
+              <a href="mon_comptes" class="btn btn-success btn-sm d-none d-md-block">Actuliser</a>
             </div>
 
           </div>
@@ -98,57 +103,71 @@
 
             <!-- Réservation en cours -->
             <div class="tab-pane fade show active" id="bookmarked" role="tabpanel" aria-labelledby="bookmarked-tab">
-              <h2>Votre colis est en cours de route</h2>
+              @php
+                if ($resNew!=0) {
+                  echo "<h2>Vos colis sont en cours de route</h2>";
+                }else{
+                  echo '<div class="alert alert-warning" role="alert">Aucune réservations</div>';
+                }
+              @endphp
+
+
               <br>
               <div class="row">
-               <?php for($i=0;$i<=3;$i++){?>
+                {{-- {{dd($res_new)}} --}}
+               @foreach ($res_new as $value)
                 <div class="col-lg-3 col-md-6 col-12">
                   <!-- Card -->
                   <div class="card  mb-4 card-hover">
-                    <a href="#!" class="card-img-top"><img src="assets/images/course/car.jpg" alt=""
+                    <a href="#!" class="card-img-top"><img src="{{$value->vehicule}}" alt=""
                         class="card-img-top rounded-top"></a>
                     <!-- Card body -->
                     <div class="card-body">
                       <h4 class="h4 mb-2 text-truncate-line-2 ">
                         <a href="#" class="text-warning">
-                          Toumodi - Abidjan
+                          {{ReadVille($value->depart)}} - {{ReadVille($value->arrive)}}
                         </a>
                       </h4>
                       <div class="lh-1 mt-3">
-                        <span class="text-dark font-weight-bold">1000 fcfa / place</span>
+                        <span class="text-dark font-weight-bold">{{$value->montant}} fcfa / place</span>
                       </div><br>
                       <!-- List -->
 
                       <div class="lh-1">
                         <span class="text-success">unité : </span>
-                        <span class="font-size-xs text-muted">Carton de tomate</span>
+                        <span class="font-size-xs text-muted">{{ReadUnites($value->unite)}}</span>
                       </div><br>
 
                       <div class="lh-1">
                         <span class="text-success">Tel  : </span>
-                        <span class="font-size-xs text-muted">225 01 02 20 52 11</span>
+                        <span class="font-size-xs text-muted">{{transpTel($value->transporteur_id)}}</span>
+                      </div><br>
+
+                      <div class="lh-1">
+                        <span class="text-success">Arrêt  : </span>
+                        <span class="font-size-xs text-muted">{{$value->arret}}</span>
                       </div><br>
 
                       <ul class="mb-3 list-inline">
                         <li class="list-inline-item">
-                        <span class="text-success">Commande : </span> 10 places
+                        <span class="text-success">Commande : </span> {{$value->qte}} places
                         </li>
                       </ul>
 
                       <!-- Price -->
                       <div class="lh-1 mt-3">
-                        <span class="text-success">Montant payé : </span>10 000 fcfa
+                        <span class="text-success">Montant payé : </span>{{$value->qte*$value->montant}} fcfa
                       </div><br>
-                      <b>Le 11/01/2021</b>
+                      <b>Le {{$value->date}}</b>
                     </div>
                     <!-- Card footer -->
                     <div class="card-footer">
                       <div class="row align-items-center no-gutters">
                         <div class="col-auto">
-                          <img src="../assets/images/avatar/avatar-3.jpg" class="rounded-circle avatar-xs" alt="">
+                          <img src="{{transpProf($value->transporteur_id)}}" class="rounded-circle avatar-xs" alt="">
                         </div>
                         <div class="col ml-2">
-                          <span>Morris Mccoy</span>
+                          <span>{{transpNom($value->transporteur_id)}}</span>
                         </div>
                         <div class="col-auto">
                           <a href="#!" class="text-white" title="Réserver une place">
@@ -162,7 +181,7 @@
                     </div>
                   </div>
                 </div>
-                <?php }?>
+               @endforeach
               </div>
 
               <div class="row">
@@ -174,56 +193,74 @@
 
             <!-- Colis livré -->
             <div class="tab-pane fade" id="currentlyLearning" role="tabpanel" aria-labelledby="currentlyLearning-tab">
-              <h2>Votre colis a été livré </h2><br>
+              @php
+                if ($resLiv!=0) {
+                  echo "<h2>Vos colis ont été livrés</h2>";
+                }else{
+                  echo '<div class="alert alert-warning" role="alert">Aucune réservations livrées</div>';
+                }
+              @endphp
+
               <div class="row">
-               <?php for($i=0;$i<=3;$i++){?>
+                {{-- {{dd($res_new)}} --}}
+               @foreach ($res_liv as $value)
                 <div class="col-lg-3 col-md-6 col-12">
                   <!-- Card -->
                   <div class="card  mb-4 card-hover">
-                    <a href="#!" class="card-img-top"><img src="assets/images/course/car.jpg" alt=""
+                    <a href="#!" class="card-img-top"><img src="{{$value->vehicule}}" alt=""
                         class="card-img-top rounded-top"></a>
                     <!-- Card body -->
                     <div class="card-body">
                       <h4 class="h4 mb-2 text-truncate-line-2 ">
                         <a href="#" class="text-warning">
-                          Toumodi - Abidjan
+                          {{ReadVille($value->depart)}} - {{ReadVille($value->arrive)}}
                         </a>
                       </h4>
                       <div class="lh-1 mt-3">
-                        <span class="text-dark font-weight-bold">1000 fcfa / place</span>
+                        <span class="text-dark font-weight-bold">{{$value->montant}} fcfa / place</span>
                       </div><br>
                       <!-- List -->
 
                       <div class="lh-1">
                         <span class="text-success">unité : </span>
-                        <span class="font-size-xs text-muted">Carton de tomate</span>
+                        <span class="font-size-xs text-muted">{{ReadUnites($value->unite)}}</span>
                       </div><br>
 
                       <div class="lh-1">
                         <span class="text-success">Tel  : </span>
-                        <span class="font-size-xs text-muted">225 01 02 20 52 11</span>
+                        <span class="font-size-xs text-muted">{{transpTel($value->transporteur_id)}}</span>
+                      </div><br>
+
+                      <div class="lh-1">
+                        <span class="text-success">Arrêt  : </span>
+                        <span class="font-size-xs text-muted">{{$value->arret}}</span>
+                      </div><br>
+
+                      <div class="lh-1">
+                        <span class="text-success">Livré le  : </span>
+                        <span class="font-size-xs text-muted">{{$value->livdate}}</span>
                       </div><br>
 
                       <ul class="mb-3 list-inline">
                         <li class="list-inline-item">
-                        <span class="text-success">Commande : </span> 10 places
+                        <span class="text-success">Commande : </span> {{$value->qte}} places
                         </li>
                       </ul>
 
                       <!-- Price -->
                       <div class="lh-1 mt-3">
-                        <span class="text-success">Montant payé : </span>10 000 fcfa
+                        <span class="text-success">Montant payé : </span>{{$value->qte*$value->montant}} fcfa
                       </div><br>
-                      <b>Le 11/01/2021</b>
+                      <b>Réservé le {{$value->date}}</b><br>
                     </div>
                     <!-- Card footer -->
                     <div class="card-footer">
                       <div class="row align-items-center no-gutters">
                         <div class="col-auto">
-                          <img src="../assets/images/avatar/avatar-3.jpg" class="rounded-circle avatar-xs" alt="">
+                          <img src="{{transpProf($value->transporteur_id)}}" class="rounded-circle avatar-xs" alt="">
                         </div>
                         <div class="col ml-2">
-                          <span>Morris Mccoy</span>
+                          <span>{{transpNom($value->transporteur_id)}}</span>
                         </div>
                         <div class="col-auto">
                           <a href="#!" class="text-white" title="Réserver une place">
@@ -237,8 +274,9 @@
                     </div>
                   </div>
                 </div>
-                <?php }?>
+               @endforeach
               </div>
+
               <div class="row">
                 <div class="offset-lg-3 col-lg-6 col-md-12 col-12 text-center mt-5">
                   <p>Réduisons ensemble les pertes post-recoltes</p>
