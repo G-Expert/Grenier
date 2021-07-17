@@ -7,10 +7,22 @@
   #Reservation livrée
   $res_liv = reserv($_SESSION['id_user'],1);
   $resLiv = count($res_liv);
-  // dd($res_liv);
-  #transporteur
-  // $transp = transpProf(6);
-  // dd($transp);
+  #Id transporteur en fonction de l'user
+  $transp = transpID($_SESSION['id_user']);
+  #Livraisons en cours
+  $liv_new = livr($transp,0);
+  $nbLiv = count($liv_new);
+  #Livraisons livrées
+  $liv_sold = livr($transp,1);
+  $nbLivS = count($liv_sold);
+  #User
+  // $tel = userTel(21);
+  // dd($tel);
+  //dd($liv_new);
+
+
+
+
 ?>
   <div class="pt-5">
     <div class="container">
@@ -72,11 +84,7 @@
               <a class="nav-link" id="currentlyLearning-tab" data-toggle="pill" href="#currentlyLearning" role="tab"
                 aria-controls="currentlyLearning" aria-selected="false">Réservations livrées</a>
             </li>
-            <li class="nav-item" role="presentation">
-              <a class="nav-link" id="path-tab" data-toggle="pill" href="#path" role="tab" aria-controls="path"
-                aria-selected="false">
-                Poster une offre</a>
-            </li>
+
             <li class="nav-item" role="presentation">
               <a class="nav-link" id="path-tab" data-toggle="pill" href="#commande" role="tab" aria-controls="path"
                 aria-selected="false">
@@ -87,11 +95,12 @@
                 aria-selected="false">
                 Livraisons soldées</a>
             </li>
-            {{-- <li class="nav-item" role="presentation">
-              <a class="nav-link" id="path-tab" data-toggle="pill" href="#transporteur" role="tab" aria-controls="path"
+            <li class="nav-item" role="presentation">
+              <a class="nav-link" id="path-tab" data-toggle="pill" href="#path" role="tab" aria-controls="path"
                 aria-selected="false">
-                Devenir Transporteur</a>
-            </li> --}}
+                Poster une offre</a>
+            </li>
+
             <li class="nav-item" role="presentation">
               <a class="nav-link" id="path-tab" data-toggle="pill" href="#compte" role="tab" aria-controls="path"
                 aria-selected="false">
@@ -131,8 +140,13 @@
                       <div class="lh-1 mt-3">
                         <span class="text-dark font-weight-bold">{{$value->montant}} fcfa / place</span>
                       </div><br>
-                      <!-- List -->
+                      <!-- Code -->
+                      <div class="lh-1">
+                        <span class="text-success">Code : </span>
+                        <span class="font-size-xs text-muted">{{$value->code}}</span>
+                      </div><br>
 
+                      <!-- Unité -->
                       <div class="lh-1">
                         <span class="text-success">unité : </span>
                         <span class="font-size-xs text-muted">{{ReadUnites($value->unite)}}</span>
@@ -219,8 +233,13 @@
                       <div class="lh-1 mt-3">
                         <span class="text-dark font-weight-bold">{{$value->montant}} fcfa / place</span>
                       </div><br>
-                      <!-- List -->
 
+                      <div class="lh-1">
+                        <span class="text-success">Code : </span>
+                        <span class="font-size-xs text-muted">{{$value->code}}</span>
+                      </div><br>
+
+                      <!-- Unité -->
                       <div class="lh-1">
                         <span class="text-success">unité : </span>
                         <span class="font-size-xs text-muted">{{ReadUnites($value->unite)}}</span>
@@ -383,6 +402,12 @@
 
                                         <!-- Unité -->
                                         <div class="lh-1">
+                                          <span class="text-success">Code : </span>
+                                          <span class="font-size-xs text-muted">{{$value->code}}</span>
+                                        </div><br>
+
+                                        <!-- Unité -->
+                                        <div class="lh-1">
                                           <span class="text-success">unité : </span>
                                           <span class="font-size-xs text-muted">{{ReadUnites($value->unite)}}</span>
                                         </div>
@@ -430,120 +455,83 @@
                             </div>
             </div>
 
-             <!-- Transporteur -->
-             <div class="tab-pane fade" id="transporteur" role="tabpanel" aria-labelledby="path-tab">
-                            <!-- Card -->
-                            <div class="card border-0 mb-4">
-                              <!-- Card header -->
-                              <div class="card-header">
-                                <h4 class="mb-0">Devenir transporteur</h4>
-                              </div>
-                              <!-- Card Body -->
-                              <div class="card-body">
-                                {{-- <button type="button" class="btn btn-outline-white">
-                                  <i class="fe fe-image mr-1"></i>
-                                  Photo de votre vehicule
-                                </button>
 
-                                <form action="#" class="dropzone mt-4 border-dashed">
-                                  <div class="fallback">
-                                    <input name="file" type="file" multiple />
-                                  </div>
-                                </form> --}}
-                                <div class="mt-4">
-                                  <form action="begintransp" method="post" enctype="multipart/form-data">
-                                    @csrf
-                                    <!-- Form -->
-                                    <div class="row">
-                                      <!-- Matricule de votre vehicule -->
-                                      <div class="form-group col-md-6 col-lg-12">
-                                        <label for="ville" class="form-label">Matricule de votre vehicule</label>
-                                        <input type="text" id="matricule" class="form-control text-dark"
-                                          placeholder="" name="matricule" required>
-                                      </div>
-
-                                      <!-- Photo de vevhicule -->
-                                      <div class="form-group">
-                                        <label for="photo">Photo du vehicule</label>
-                                        <div class="custom-file">
-                                         <input type="file" id="photo" name="photo" required>
-                                        </div>
-                                      </div>
-
-                                    </div>
-
-
-                                </div>
-
-                                <!-- button -->
-                                <button  class="btn btn-warning" type="submit">
-                                  Soumettre
-                                </button>
-                                </form>
-                                {{-- <a href="#!" class="btn btn-outline-danger ">
-                                 Annuler
-                                </a> --}}
-                              </div>
-                            </div>
-            </div>
-
-            <!-- Mes commandes  -->
+            <!-- Mes Livraisons à effectuer  -->
             <div class="tab-pane fade" id="commande" role="tabpanel" aria-labelledby="currentlyLearning-tab">
-              <h2>Mes commandes de colis </h2><br>
+
+              @php
+                if ($nbLiv!=0) {
+                  echo "<h2>Mes livraisons à effectuer </h2><br>";
+                }else{
+                  echo '<div class="alert alert-warning" role="alert">Aucune Livraisons à effectuer</div>';
+                }
+              @endphp
               <div class="row">
-               <?php for($i=0;$i<=3;$i++){?>
+                {{-- {{dd($res_new)}} --}}
+               @foreach ($liv_new as $value)
                 <div class="col-lg-3 col-md-6 col-12">
                   <!-- Card -->
                   <div class="card  mb-4 card-hover">
-                    <a href="#!" class="card-img-top"><img src="assets/images/course/car.jpg" alt=""
+                    <a href="#!" class="card-img-top"><img src="{{$value->vehicule}}" alt=""
                         class="card-img-top rounded-top"></a>
                     <!-- Card body -->
                     <div class="card-body">
                       <h4 class="h4 mb-2 text-truncate-line-2 ">
                         <a href="#" class="text-warning">
-                          Toumodi - Abidjan
+                          {{ReadVille($value->depart)}} - {{ReadVille($value->arrive)}}
                         </a>
                       </h4>
                       <div class="lh-1 mt-3">
-                        <span class="text-dark font-weight-bold">1000 fcfa / place</span>
+                        <span class="text-dark font-weight-bold">{{$value->montant}} fcfa / place</span>
                       </div><br>
-                      <!-- List -->
+                      <!-- Code -->
+                      <div class="lh-1">
+                        <span class="text-success">Code : </span>
+                        <span class="font-size-xs text-muted">{{$value->code}}</span>
+                      </div><br>
 
+                      <!-- Unité -->
                       <div class="lh-1">
                         <span class="text-success">unité : </span>
-                        <span class="font-size-xs text-muted">Carton de tomate</span>
+                        <span class="font-size-xs text-muted">{{ReadUnites($value->unite)}}</span>
+                      </div><br>
+
+                      <!-- Tel user -->
+                      <div class="lh-1">
+                        <span class="text-success">Tel  : </span>
+                        <span class="font-size-xs text-muted">{{userTel($value->offClient)}}</span>
                       </div><br>
 
                       <div class="lh-1">
-                        <span class="text-success">Tel  : </span>
-                        <span class="font-size-xs text-muted">225 01 02 20 52 11</span>
+                        <span class="text-success">Arrêt  : </span>
+                        <span class="font-size-xs text-muted">{{$value->arret}}</span>
                       </div><br>
 
                       <ul class="mb-3 list-inline">
                         <li class="list-inline-item">
-                        <span class="text-success">Commande : </span> 10 places
+                        <span class="text-success">Commande : </span> {{$value->qte}} places
                         </li>
                       </ul>
 
                       <!-- Price -->
                       <div class="lh-1 mt-3">
-                        <span class="text-success">Montant payé : </span>10 000 fcfa
+                        <span class="text-success">Montant payé : </span>{{$value->qte*$value->montant}} fcfa
                       </div><br>
-                      <b>Le 11/01/2021</b>
+                      <b>Le {{$value->date}}</b>
                     </div>
                     <!-- Card footer -->
                     <div class="card-footer">
                       <div class="row align-items-center no-gutters">
                         <div class="col-auto">
-                          <img src="../assets/images/avatar/avatar-3.jpg" class="rounded-circle avatar-xs" alt="">
+                          <img src="{{userProfil($value->offClient)}}" class="rounded-circle avatar-xs" alt="">
                         </div>
                         <div class="col ml-2">
-                          <span>Morris Mccoy</span>
+                          <span>{{userNom($value->offClient)}}</span>
                         </div>
                         <div class="col-auto">
                           <a href="#!" class="text-white" title="Réserver une place">
                            <span class="badge badge-danger" type="button" class="btn btn-primary"data-toggle="modal" data-target="#exampleModalLong">
-                              Commande
+                              En cours
                            </span>
                          </a>
                         </div>
@@ -552,7 +540,7 @@
                     </div>
                   </div>
                 </div>
-                <?php }?>
+               @endforeach
               </div>
               <div class="row">
                 <div class="offset-lg-3 col-lg-6 col-md-12 col-12 text-center mt-5">
@@ -561,63 +549,82 @@
               </div>
             </div>
 
-            <!-- Mes commandes soldées -->
+            <!-- Mes livraisons soldées -->
             <div class="tab-pane fade" id="commande_solde" role="tabpanel" aria-labelledby="currentlyLearning-tab">
-              <h2>Mes commandes soldées </h2><br>
+              @php
+                if ($nbLivS!=0) {
+                  echo "<h2>Mes Livraisons soldées </h2><br>";
+                }else{
+                  echo '<div class="alert alert-warning" role="alert">Aucune Livraisons soldées</div>';
+                }
+              @endphp
+
               <div class="row">
-               <?php for($i=0;$i<=3;$i++){?>
+                {{-- {{dd($res_new)}} --}}
+               @foreach ($liv_sold as $value)
                 <div class="col-lg-3 col-md-6 col-12">
                   <!-- Card -->
                   <div class="card  mb-4 card-hover">
-                    <a href="#!" class="card-img-top"><img src="assets/images/course/car.jpg" alt=""
+                    <a href="#!" class="card-img-top"><img src="{{$value->vehicule}}" alt=""
                         class="card-img-top rounded-top"></a>
                     <!-- Card body -->
                     <div class="card-body">
                       <h4 class="h4 mb-2 text-truncate-line-2 ">
                         <a href="#" class="text-warning">
-                          Toumodi - Abidjan
+                          {{ReadVille($value->depart)}} - {{ReadVille($value->arrive)}}
                         </a>
                       </h4>
                       <div class="lh-1 mt-3">
-                        <span class="text-dark font-weight-bold">1000 fcfa / place</span>
+                        <span class="text-dark font-weight-bold">{{$value->montant}} fcfa / place</span>
                       </div><br>
-                      <!-- List -->
+                      <!-- Code -->
+                      <div class="lh-1">
+                        <span class="text-success">Code : </span>
+                        <span class="font-size-xs text-muted">{{$value->code}}</span>
+                      </div><br>
 
+                      <!-- Unité -->
                       <div class="lh-1">
                         <span class="text-success">unité : </span>
-                        <span class="font-size-xs text-muted">Carton de tomate</span>
+                        <span class="font-size-xs text-muted">{{ReadUnites($value->unite)}}</span>
+                      </div><br>
+
+                      <!-- Tel user -->
+                      <div class="lh-1">
+                        <span class="text-success">Tel  : </span>
+                        <span class="font-size-xs text-muted">{{userTel($value->offClient)}}</span>
                       </div><br>
 
                       <div class="lh-1">
-                        <span class="text-success">Tel  : </span>
-                        <span class="font-size-xs text-muted">225 01 02 20 52 11</span>
+                        <span class="text-success">Arrêt  : </span>
+                        <span class="font-size-xs text-muted">{{$value->arret}}</span>
                       </div><br>
 
                       <ul class="mb-3 list-inline">
                         <li class="list-inline-item">
-                        <span class="text-success">Commande : </span> 10 places
+                        <span class="text-success">Commande : </span> {{$value->qte}} places
                         </li>
                       </ul>
 
                       <!-- Price -->
                       <div class="lh-1 mt-3">
-                        <span class="text-success">Montant payé : </span>10 000 fcfa
+                        <span class="text-success">Montant payé : </span>{{$value->qte*$value->montant}} fcfa
                       </div><br>
-                      <b>Le 11/01/2021</b>
+                      <b>Le {{$value->date}}</b>
                     </div>
                     <!-- Card footer -->
                     <div class="card-footer">
                       <div class="row align-items-center no-gutters">
                         <div class="col-auto">
-                          <img src="../assets/images/avatar/avatar-3.jpg" class="rounded-circle avatar-xs" alt="">
+                          <img src="{{userProfil($value->offClient)}}" class="rounded-circle avatar-xs" alt="">
                         </div>
                         <div class="col ml-2">
-                          <span>Morris Mccoy</span>
+                          <span>{{userNom($value->offClient)}}</span>
                         </div>
                         <div class="col-auto">
                           <a href="#!" class="text-white" title="Réserver une place">
-                           <span class="badge badge-success" type="button" class="btn btn-primary"data-toggle="modal" data-target="#exampleModalLong">
-                              soldée
+                           <span class="badge badge-danger" type="button" class="btn btn-primary"data-toggle="modal" data-target="#exampleModalLong">
+                              En cours
                            </span>
                          </a>
                         </div>
@@ -626,7 +633,7 @@
                     </div>
                   </div>
                 </div>
-                <?php }?>
+               @endforeach
               </div>
               <div class="row">
                 <div class="offset-lg-3 col-lg-6 col-md-12 col-12 text-center mt-5">

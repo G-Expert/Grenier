@@ -19,9 +19,7 @@ class CompteController extends Controller
        $prenom = $request->prenom;
        $tel = '225'.$request->tel;
        $password = $request->password;
-
        // Data user
-
        $user = ['prenom'=>$prenom,
                 'nom' =>$nom,
                 'tel'=>$tel,
@@ -30,14 +28,21 @@ class CompteController extends Controller
       $res = Users::where('tel','=',$tel)->first();
       if ($res=='') {
         // Creation de compte user
-        Users::create($user);
+        $idus = Users::create($user);
+        $transpdata = ['matricule'=>'default','photo'=>'null','user_id'=>$idus->id];
+        //dd($transpdata);
+        $trans = Transporteur::create($transpdata);
 
         // Retour json
-        return response()->json(['code' => '1'],200);
+
         $_SESSION['nom'] = $nom;
         $_SESSION['prenom'] = $prenom;
         $_SESSION['tel'] = $tel;
         $_SESSION['password'] = $password;
+        $_SESSION['id_user'] = $idus->id;
+        $_SESSION['profile'] = $idus->profile;
+        return response()->json(['code' => '1'],200);
+
       }
       else {
           return response()->json(['code' => '2'],200);
@@ -174,11 +179,12 @@ class CompteController extends Controller
      $arrive = $request->arrive;
      $places = $request->places;
      $unite  = $request->unite;
+     $code   = date("YmdHis").'off';
      $dateOf = date('d/m/Y');
      $idtransp = transpID($_SESSION['id_user']);
      $dataOffre = ['depart'=>$depart,'arrive'=>$arrive,'placedispo'=>$places,'montant'=>$prix,
                    'transporteur_id'=>$idtransp,'user_id'=>$_SESSION['id_user'],'vehicule'=>$vehicule,
-                   'unite'=>$unite,'date'=>$dateOf];
+                   'unite'=>$unite,'date'=>$dateOf,'code'=>$code];
      // dd($dataOffre);
      $offre = Offres::create($dataOffre);
      $_SESSION['error_transp'] = "Nouvelle Offre: Votre offre a été publiée avec succès";

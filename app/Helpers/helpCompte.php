@@ -51,6 +51,7 @@ function offre($user)
             ->join('villes', 'offres.depart','=','villes.id')
             ->select('offres.*','users.*','offres.id as offID','users.id as Usid')
             ->where('users.id', '=', $user)
+            ->where('offres.etat', '=',0)
             ->get();
   return $offres;
 }
@@ -75,7 +76,7 @@ function ReadUnites($id)
   // Suppression d'une offre
    function delOffre($id)
    {
-     $res = DB::table('offres')->where('offres.id', '=', $id)->delete();
+     $res = DB::table('offres')->where('offres.id', '=', $id)->update(['etat' => 1]);
      return $res;
    }
 
@@ -142,6 +143,25 @@ function transpProf($id)
   return $transp->profile;
 }
 
+#Gestion des users
+function userTel($id)
+{
+  $user = DB::table('users')->where('users.id','=',$id)->first();
+  return $user->tel;
+}
+
+
+function userNom($id)
+{
+  $user = DB::table('users')->where('users.id','=',$id)->first();
+  return $user->nom." ".$user->prenom;
+}
+
+function userProfil($id)
+{
+  $user = DB::table('users')->where('users.id','=',$id)->first();
+  return $user->profile;
+}
 
 
 #Gestion des livraison
@@ -150,7 +170,7 @@ function livr($transp,$statut)
   $offres = DB::table('offre_has_client')
             ->join('users', 'offre_has_client.user_id','=','users.id')
             ->join('offres', 'offre_has_client.offre_id','=','offres.id')
-            ->select('offre_has_client.*','offres.*','offres.id as Usid')
+            ->select('offre_has_client.*','offres.*','offres.id as Offid','offres.user_id as OffUser','offre_has_client.user_id as offClient')
             ->where('offre_has_client.offre_transporteur_id', '=', $transp)
             ->where('offre_has_client.livraison', '=', $statut)
             ->get();
