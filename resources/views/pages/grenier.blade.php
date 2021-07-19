@@ -1,4 +1,11 @@
-    <!-- Page Content -->
+<?php
+#Les offres publiées
+  $off = ReadOf(0);
+  $nbof = count($off);
+#Simulation de reservation
+
+?>
+  <!-- Page Content -->
     <div class="bg-warning">
         <div class="container">
             <!-- Hero Section -->
@@ -37,8 +44,9 @@
                 <!-- Features -->
                 <div class="col-xl-4 col-lg-4 col-md-6 mb-lg-0 mb-4">
                     <div class="d-flex align-items-center">
-                        <span class="icon-sahpe icon-lg bg-light-warning rounded-circle text-center text-dark-warning font-size-md "> <i
-                class="fe fe-video"> </i></span>
+                        <span class="icon-sahpe icon-lg bg-light-warning rounded-circle text-center text-dark-warning font-size-md ">
+                          <i class="fe fe-truck"></i>
+                        </span>
                         <div class="ml-3">
                             <h4 class="mb-0 font-weight-semi-bold">plus de 100 transporteurs</h4>
                             <p class="mb-0">Des vehicules convenables</p>
@@ -48,8 +56,8 @@
                 <!-- Features -->
                 <div class="col-xl-4 col-lg-4 col-md-6 mb-lg-0 mb-4">
                     <div class="d-flex align-items-center">
-                        <span class="icon-sahpe icon-lg bg-light-warning rounded-circle text-center text-dark-warning font-size-md "> <i
-                class="fe fe-users"> </i></span>
+                        <span class="icon-sahpe icon-lg bg-light-warning rounded-circle text-center text-dark-warning font-size-md ">
+                          <i class="fe fe-headphones"> </i></span>
                         <div class="ml-3">
                             <h4 class="mb-0 font-weight-semi-bold">Disponibilité</h4>
                             <p class="mb-0">24h/24 - 7j/7</p>
@@ -90,32 +98,35 @@
                         <div class="row">
 
                          <div class="col-lg-4">
-                          <select class="selectpicker" data-width="100%">
+                          <select class="selectpicker departSelect" data-width="100%">
                             <option value="">Départ</option>
-                            <option value="&#8377; Indian">Toumodi</option>
-                            <option value="$ USD">Abidjan</option>
+                            @foreach (ReadZone() as $value)
+                            <option value="{{$value->id}}">{{$value->nom}}</option>
+                            @endforeach
                           </select>
                          </div>
 
                          <div class="col-lg-4">
-                          <select class="selectpicker" data-width="100%">
+                          <select class="selectpicker arriveSelect" data-width="100%">
                             <option value="">Arrivé</option>
-                            <option value="&#8377; Indian">Toumodi</option>
-                            <option value="$ USD">Abidjan</option>
+                            @foreach (ReadZone() as $value)
+                            <option value="{{$value->id}}">{{$value->nom}}</option>
+                            @endforeach
                           </select>
                          </div>
 
                          <div class="col-lg-4">
-                          <select class="selectpicker" data-width="100%">
+                          <select class="selectpicker uniteSelect" data-width="100%">
                             <option value="">Unité</option>
-                            <option value="&#8377; Indian">Carton </option>
-                            <option value="$ USD">Sac</option>
+                            @foreach (ReadUnite() as $value)
+                              <option value="{{$value->id}}">{{$value->unite}}</option>
+                            @endforeach
                           </select>
                          </div>
 
                         </div>
                      </form>
-                     <button type="submit" class="btn btn-success mt-3">Rechercher</button>
+                     <button type="submit" class="btn btn-success mt-3 grenierCheck">Rechercher</button>
                     </div>
                 </div>
                     <!-- Card -->
@@ -143,36 +154,37 @@
                         <i class="fe fe-chevron-right"></i>
                     </li>
                 </ul>
-                <div class="sliderFirst">
+                <div class="sliderFirst offresZone">
 
                    <?php
-                      for($i=0;$i<=10;$i++){
+                      if ($nbof!=0) {
+                      foreach ($off as $key => $value){
                      ?>
 
                     <div class="item">
                         <!-- Card -->
                         <div class="card  mb-4 card-hover">
                             <a href="#" class="card-img-top">
-                            <img src="assets/images/course/car.jpg" alt="" class="rounded-top card-img-top">
+                            <img src="{{$value->vehicule}}" alt="" class="rounded-top card-img-top">
                             </a>
                             <!-- Card Body -->
                             <div class="card-body">
                                 <h4 class="mb-2 text-truncate-line-2 ">
                                   <a href="#" class="text-inherit text-warning">
-                                    Toumodi - Abidjan
+                                    {{ReadVille($value->depart)}} - {{ReadVille($value->arrive)}}
                                   </a>
                                 </h4>
                                 <!-- List -->
                                 <ul class="mb-3 list-inline">
-                                    <li class="list-inline-item"><i class="far fa-clock mr-1"></i>10 places</li>
+                                    <li class="list-inline-item"><i class="far fa-clock mr-1"></i>{{$value->placedispo}} places</li>
                                 </ul>
                                 <div class="lh-1">
                                     <span class="text-warning">unité : </span>
-                                    <span class="font-size-xs text-muted">Carton de tomate</span>
+                                    <span class="font-size-xs text-muted">{{ReadUnites($value->unite)}}</span>
                                 </div>
                                 <!-- Price -->
                                 <div class="lh-1 mt-3">
-                                    <span class="text-dark font-weight-bold">1000 fcfa / place</span>
+                                    <span class="text-dark font-weight-bold">{{$value->montant}} fcfa / place</span>
                                     <!--<del class="font-size-xs text-muted">$750</del>-->
                                 </div>
                             </div>
@@ -180,13 +192,13 @@
                             <div class="card-footer">
                                 <div class="row align-items-center no-gutters">
                                     <div class="col-auto">
-                                        <img src="assets/images/avatar/avatar-1.jpg" class="rounded-circle avatar-xs" alt="">
+                                        <img src="{{$value->profile}}" class="rounded-circle avatar-xs" alt="">
                                     </div>
                                     <div class="col ml-2">
-                                        <span>Touré Abou</span>
+                                        <span>{{$value->nom." ".$value->prenom}}</span>
                                     </div>
                                     <div class="col-auto">
-                                        <a href="#!" class="text-white" title="Réserver une place">
+                                        <a href="#!" class="text-white  reserv" title="Réserver une place" id="{{$value->Ofid}}">
                                         <span class="badge badge-warning" type="button" class="btn btn-primary"
                                               data-toggle="modal" data-target="#exampleModalLong">
                                           Réserver
@@ -198,7 +210,7 @@
                         </div>
                     </div>
 
-                    <?php } ?>
+                    <?php }}else{echo '<div class="alert alert-warning offresZone" role="alert">Aucun transporteur disponible !</div>';} ?>
 
 
 
@@ -222,35 +234,39 @@
       <div class="modal-body">
             <div class="row align-items-center no-gutters">
                 <div class="col-auto">
-                 <img src="assets/images/avatar/avatar-1.jpg" class="rounded-circle avatar-xl" alt="">
+                 <img src="assets/images/avatar/avatar-1.jpg" class="rounded-circle avatar-xl profile" alt="">
                 </div>
                 <div class="col ml-2">
                  <span class="text-warning">Transporteur : </span>
-                 <span>Touré Abou</span><br>
-                 <span><b>Toumodi - Abidjan</b></span><br>
-                 <span>10 places</span><br>
-                 <span><b>1000 fcfa / place</b></span><br>
-                 <span>Unité : Carton</span>
+                 <span class="transp">Touré Abou</span><br>
+                 <span><b class="destin">Toumodi - Abidjan</b></span><br>
+                 <span><span class="place">10</span> places disponible</span><br>
+                 <span><b><span class="prix">1000</span> fcfa / place</b></span><br>
+                 <span>Unité : <span class="unite"></span></span>
                 </div>
             </div><hr>
             <div class="form-group">
-                <label class="input-label" for="selectOne">Combien de places voulez-vous ?
-                <span class="input-label-secondary"></span></label>
-                <select id="selectOne" class="form-control">
-                    <option>Choisir</option>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                </select>
+              <label class="input-label" for="textInput">Point d'arrêt(où se trouve vos produits ?)</label>
+              <input type="text" id="textInput" class="form-control arret"placeholder="Ex:Sikensi sur le tronçon Toumodi-Abidjan">
             </div>
+
+            <div class="form-group">
+              <label class="input-label" for="textInput">Quantité(Combien de places voulez-vous ?)</label>
+              <input type="number" id="textInput" class="form-control qtecmd" placeholder="">
+              <input type="hidden" class="idoff">
+              <input type="hidden" class="idtransp">
+              <input type="hidden" class="teltransp">
+              <input type="hidden" class="uniteOf">
+            </div>
+
+
             <div class="alert alert-warning" role="alert">
-                Montant à payer : 00 fcfa
+                Montant à payer : <span class="payer">00</span> fcfa
             </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-warning">Réserver</button>
+        <button type="button" class="btn btn-secondary annulBtn" data-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-warning reservBtn">Réserver</button>
       </div>
     </div>
   </div>

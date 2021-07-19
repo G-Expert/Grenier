@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -9,6 +7,7 @@ use App\Models\Users;
 use App\Models\Transporteur;
 use App\Models\Admin;
 use App\Models\Offres;
+
 
 class CompteController extends Controller
 {
@@ -196,9 +195,9 @@ class CompteController extends Controller
    public function addtransporteur(Request $request)
    {
      $lien  = env('LIEN_FILE');
-     $file  = $request->photo;
-     $path  = $file->store('vehicule','public');
-     $photo = $lien.$path;
+     //$file  = $request->photo;
+     //$path  = $file->store('vehicule','public');
+     //$photo = $lien.$path;
      $nom = $request->nom;
      $prenom = $request->prenom;
      $tel = '225'.$request->tel;
@@ -219,7 +218,7 @@ class CompteController extends Controller
          $user = Users::create($userdata);
          $user_id = $user->id;
 
-         $transpdata = ['matricule'=>$matricule,'photo'=>$photo,'user_id'=>$user_id];
+         $transpdata = ['matricule'=>$matricule,'photo'=>'photo','user_id'=>$user_id];
          Transporteur::create($transpdata);
          $_SESSION['nom'] = $nom.' '.$prenom;
          $_SESSION['error_transp'] = "Devenir transporteur: Votre demande a été pris en compte nous vous contactons dans 24h!";
@@ -241,6 +240,77 @@ class CompteController extends Controller
      $res = delOffre($request->idOf);
      $_SESSION['error_transp'] = "Offre Supprimée avec succès";
      return response()->json(['code' => '2'],200);
+   }
+
+   //Lecture des infos offres
+   public function readoff(Request $request)
+   {
+      $infos  = ReadOff($request->offre);
+      $nom    = $infos->nom.' '.$infos->prenom;
+      $destin = ReadVille($infos->depart).' - '.ReadVille($infos->arrive);
+      $places = $infos->placedispo;
+      $prix   = $infos->montant;
+      $telTrp = $infos->tel;
+      $unite  = ReadUnites($infos->unite);
+      $profile = $infos->profile;
+      $idoff = $infos->Ofid;
+      $idtransp = $infos->transporteur_id;
+      $data   = response()->json(['transp'=>$nom,
+                                  'price'=>$prix,
+                                  'destin'=>$destin,
+                                  'place'=>$places,
+                                  'profile'=>$profile,
+                                  'idoff'=>$idoff,
+                                  'idtransp'=>$idtransp,
+                                  'teltransp'=>$telTrp,
+                                  'unite'=>$unite]);
+
+      return $data;
+
+   }
+
+   //Lancement de la reservation
+   public function saveReserv(Request $request)
+   {
+     $idoff    = $request->idoff;
+     $idtransp = $request->idtransp;
+     $arret    = $request->arret;
+     $qte      = $request->qte;
+     $place    = $request->place;
+     $telT     = $request->telT;
+     $unite    = $request->unite;
+     $date     = date('d/m/Y');
+     $paiement = date("YmdHis");
+     $statut   = 0;
+     $livraison = 0;
+     $code = date("YmdHis").'cmd';
+     if (isset($_SESSION['tel']) AND !empty($_SESSION['tel'])) {
+       //Génération du paiement
+       paiement($paiement,0);
+       //Insertion de la reservation
+       addreserv($idoff,$idtransp,$qte,$arret,$date,$paiement,$statut,$livraison,$code,$_SESSION['id_user']);
+       //Mise à jour des places disponible
+       $placeDisp = $place-$qte;
+       upPlace($placeDisp,$idoff);
+       //Notification SMS
+       $msg = 'Reservation de '.$qte.' '.$unite.' à'.' '.$arret.',Contact:'.$_SESSION['tel'];
+       $sender = 'GRENIER';
+       //SMS($msg,$telT,$sender);
+       //Retour du traitement
+       $data = response()->json(['code' => '1'],200);
+     }else{
+       //Vérification nombre de place
+       if($qte>$place){
+         $data = response()->json(['code' => '3'],200);
+       }elseif ($qte==0) {
+         $data = response()->json(['code' => '3'],200);
+       }else{
+         //Demande de connection
+         $data = response()->json(['code' => '2'],200);
+       }
+
+     }
+     return $data;
    }
 
 }

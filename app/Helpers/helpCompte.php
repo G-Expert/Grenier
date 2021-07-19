@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\DB;
 use App\Models\Ville;
 use App\Models\Unite;
+
 # Gestion des zones
 function AddZone($zone)
 {
@@ -80,7 +81,39 @@ function ReadUnites($id)
      return $res;
    }
 
- // Selection de l'id transporteur en fonction de l'id user
+   function ReadOf($etat)
+   {
+     $offres = DB::table('offres')
+               ->join('users', 'offres.user_id','=','users.id')
+               ->select('offres.*','users.*','offres.id as Ofid')
+               ->where('offres.etat', '=', $etat)
+               ->where('offres.placedispo', '>',0)
+               ->orderBy('offres.id', 'desc')
+               ->get();
+     return $offres;
+   }
+
+   function ReadOff($idof)
+   {
+     $offres = DB::table('offres')
+               ->join('users', 'offres.user_id','=','users.id')
+               ->select('offres.*','users.*','offres.id as Ofid')
+               ->where('offres.id', '=', $idof)
+               ->orderBy('offres.id', 'desc')
+               ->first();
+     return $offres;
+   }
+
+   function upPlace($place,$idof)
+   {
+     $res = DB::table('offres')
+                 ->where('offres.id', '=', $idof)
+                 ->update(['placedispo'=>$place]);
+   }
+
+
+#Gestion des transporteur
+ //Selection de l'id transporteur en fonction de l'id user
  function transpID($user)
  {
    $transp =  DB::table('transporteurs')->where('transporteurs.user_id','=',$user)->first();
@@ -99,6 +132,29 @@ function reserv($user,$statut)
             ->where('offre_has_client.statut', '=', $statut)
             ->get();
   return $offres;
+}
+
+function addreserv($offre_id,$transporteur_id,$qte,$arret,$date,$numPaiement,$statut,$livraison,$code,$user_id)
+{
+  $dataReserv = ['offre_id'=>$offre_id,
+                 'offre_transporteur_id'=>$transporteur_id,
+                 'qte'=>$qte,
+                 'arret'=>$arret,
+                 'date'=>$date,
+                 'numpaiement'=>$numPaiement,
+                 'statut'=>$statut,
+                 'livraison'=>$livraison,
+                 'code'=>$code,
+                 'user_id'=>$user_id];
+   $res = DB::table('offre_has_client')->insert($dataReserv);
+   return $res;
+}
+
+function paiement($numpaiement,$statut)
+{
+  $datapay = ['numpaiement'=>$numpaiement,'statut'=>$statut];
+  $res = DB::table('paiement')->insert($datapay);
+  return $res;
 }
 
 #Gestion des transporteurs
@@ -163,7 +219,6 @@ function userProfil($id)
   return $user->profile;
 }
 
-
 #Gestion des livraison
 function livr($transp,$statut)
 {
@@ -176,3 +231,88 @@ function livr($transp,$statut)
             ->get();
   return $offres;
 }
+
+#Gestion des notifications
+ //SMS
+ function SMS($msg,$tel,$sender)
+ {
+    // Filtrer le messages
+         $nvMsg = str_replace('à','a', $msg);
+         $nvMsg = str_replace('á','a', $nvMsg);
+         $nvMsg = str_replace('â','a', $nvMsg);
+         $nvMsg = str_replace('ç','c', $nvMsg);
+         $nvMsg = str_replace('è','e', $nvMsg);
+         $nvMsg = str_replace('é','e', $nvMsg);
+         $nvMsg = str_replace('ê','e', $nvMsg);
+         $nvMsg = str_replace('ë','e', $nvMsg);
+         $nvMsg = str_replace('ù','u', $nvMsg);
+         $nvMsg = str_replace('ù','u', $nvMsg);
+         $nvMsg = str_replace('ü','u', $nvMsg);
+         $nvMsg = str_replace('û','u', $nvMsg);
+         $nvMsg = str_replace('ô','o', $nvMsg);
+         $nvMsg = str_replace('î','i', $nvMsg);
+         $key = "46635f08c5ee833a42aa16e3273fd1";
+         $api = 'Authorization: Bearer '.$key."";
+         // Step 1: Créer la campagne
+         $curl = curl_init();
+         $datas= [
+           'step' => NULL,
+           'sender' => $sender,
+           'name' => 'SMS GRENIER',
+           'campaignType' => 'SIMPLE',
+           'recipientSource' => 'CUSTOM',
+           'groupId' => NULL,
+           'filename' => NULL,
+           'saveAsModel' => false,
+           'destination' => 'NAT_INTER',
+           'message' => $msg,
+           'emailText' => NULL,
+           'recipients' =>
+           [
+             [
+               'phone' => $tel,
+             ],
+           ],
+           'sendAt' => [],
+           'dlrUrl' => NULL,
+           'responseUrl' => NULL,
+         ];
+         curl_setopt_array($curl, array(
+           CURLOPT_URL => 'https://api.letexto.com/v1/campaigns',
+           CURLOPT_RETURNTRANSFER => true,
+           CURLOPT_ENCODING => '',
+           CURLOPT_MAXREDIRS => 10,
+           CURLOPT_TIMEOUT => 0,
+           CURLOPT_FOLLOWLOCATION => true,
+           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+           CURLOPT_CUSTOMREQUEST => 'POST',
+           CURLOPT_POSTFIELDS =>json_encode($datas),
+           CURLOPT_HTTPHEADER => array(
+             $api,
+             'Content-Type: application/json'
+           ),
+         ));
+         $response = curl_exec($curl);
+         curl_close($curl);
+         $res = json_decode($response);
+         $camp_id = $res->id;
+
+         // Step2: Programmer la campagne
+         $curl_send = curl_init();
+         curl_setopt_array($curl_send, array(
+           CURLOPT_URL => 'https://api.letexto.com/v1/campaigns/'.$camp_id.'/schedules',
+           CURLOPT_RETURNTRANSFER => true,
+           CURLOPT_ENCODING => '',
+           CURLOPT_MAXREDIRS => 10,
+           CURLOPT_TIMEOUT => 0,
+           CURLOPT_FOLLOWLOCATION => true,
+           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+           CURLOPT_CUSTOMREQUEST => 'POST',
+           CURLOPT_HTTPHEADER => array(
+             $api
+           ),
+         ));
+         $response_send = curl_exec($curl_send);
+         curl_close($curl_send);
+         return $response_send;
+   }

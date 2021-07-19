@@ -176,3 +176,9 @@ Route::get('/unite_sms', function () {
 
    // Supprimer une offre::Compte client
    Route::get('delOf',[CompteController::class, 'delOf']);
+
+#Module de gestion de la vue principale
+   //Infos de reservation
+   Route::get('readoff',[CompteController::class, 'readoff']);
+   //Lancement de la reservation
+   Route::get('saveReserv',[CompteController::class, 'saveReserv']);
