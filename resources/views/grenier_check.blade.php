@@ -1,5 +1,5 @@
 @include('layouts.header')
-  @include('pages.grenier')
+  @include('pages.check')
 @include('layouts.footer')
 
 <script type="text/javascript">

@@ -313,4 +313,16 @@ class CompteController extends Controller
      return $data;
    }
 
+   //Filtre de Recherche
+   public function grenier_check(Request $request)
+   {
+     $depart = $request->departSelect;
+     $arrive = $request->arriveSelect;
+     $unite = $request->uniteSelect;
+     $data = ['depart'=>$depart,'arrive'=>$arrive,'unite'=>$unite];
+     return view('grenier_check')->with('depart',$depart)
+                                 ->with('arrive',$arrive)
+                                 ->with('unite',$unite);
+   }
+
 }

@@ -1,6 +1,7 @@
 <?php
 #Les offres publiées
-  $off = ReadOf(0);
+  $data = ['depart'=>$depart,'arrive'=>$arrive,'unite'=>$unite];
+  $off = checkOf(0,$depart,$arrive,$unite);
   $nbof = count($off);
 #Simulation de reservation
 
@@ -138,7 +139,7 @@
         </div>
     </div>
 
-    <div class="pt-lg-12 pb-lg-3 pt-8 pb-6">
+    <div class="pt-lg-12 pb-lg-3 pt-8 pb-6" id="transpo">
         <div class="container">
 
             <div class="row mb-4">

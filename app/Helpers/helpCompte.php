@@ -93,6 +93,21 @@ function ReadUnites($id)
      return $offres;
    }
 
+   function checkOf($etat,$depart,$arrive,$unite)
+   {
+     $offres = DB::table('offres')
+               ->join('users', 'offres.user_id','=','users.id')
+               ->select('offres.*','users.*','offres.id as Ofid')
+               ->where('offres.etat', '=', $etat)
+               ->where('offres.depart', '=', $depart)
+               ->where('offres.arrive', '=', $arrive)
+               ->where('offres.unite', '=', $unite)
+               ->where('offres.placedispo', '>',0)
+               ->orderBy('offres.id', 'desc')
+               ->get();
+     return $offres;
+   }
+
    function ReadOff($idof)
    {
      $offres = DB::table('offres')

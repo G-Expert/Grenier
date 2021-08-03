@@ -182,3 +182,6 @@ Route::get('/unite_sms', function () {
    Route::get('readoff',[CompteController::class, 'readoff']);
    //Lancement de la reservation
    Route::get('saveReserv',[CompteController::class, 'saveReserv']);
+
+#Filtre de recherche
+  Route::post('grenier_check',[CompteController::class, 'grenier_check']);
